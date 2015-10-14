@@ -37,11 +37,11 @@ hist(nsteps$stepsperday, breaks= seq(0,25000,by=1000),
 ### 3. Calculate and report the mean and median of the total number of steps taken per day
 
 ```r
-meansteps <- mean(nsteps$stepsperday)
+meansteps <- round(mean(nsteps$stepsperday), digits = 0)
 mediansteps <- median(nsteps$stepsperday)
 ```
 
-- Mean: 9354.2295082  
+- Mean: 9354  
 - Median: 10395
 
 
@@ -111,17 +111,23 @@ hist(nstepsimp$stepsperday, breaks= seq(0,25000,by=1000),
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
 ```r
-meanstepsimp <- mean(nstepsimp$stepsperday)
+meanstepsimp <- round(mean(nstepsimp$stepsperday), digits = 0)
 medianstepsimp <- median(nstepsimp$stepsperday)
 
 meandiff <- meanstepsimp-meansteps
 mediandiff <- medianstepsimp-mediansteps
+
+totsteps <- sum(stepdata$steps, na.rm = TRUE)
+totstepsimp <- sum(stepdataimputed$steps)
+stepsdiff <- totstepsimp-totsteps
 ```
 
-- Mean (Imputed): 1.0766189 &times; 10<sup>4</sup>  
+- Mean (Imputed): 1.0766 &times; 10<sup>4</sup>  
 - Median (Imputed): 1.0766189 &times; 10<sup>4</sup>  
 - Yes, these values differ from the estimates in the first part of the assignment.  
-- The mean number of steps goes up by 1411.959171 and the median goes up by 371.1886792
+- The mean number of steps goes up by 1412 and the median goes up by 371.1886792
+- The total number of steps before and after imputation is 570608 and 6.5673751 &times; 10<sup>5</sup> respectively.
+- The total number of steps goes up by 8.6129509 &times; 10<sup>4</sup>
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
