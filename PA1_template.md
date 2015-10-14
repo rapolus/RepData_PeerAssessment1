@@ -6,6 +6,7 @@
 
 ```r
 suppressPackageStartupMessages(suppressWarnings(library(dplyr)))
+suppressPackageStartupMessages(suppressWarnings(library(ggplot2)))
 stepdata <- read.csv("activity.csv", header = TRUE)
 ```
 
@@ -29,7 +30,7 @@ nsteps <- stepdata %>%
 hist(nsteps$stepsperday, breaks= seq(0,25000,by=1000),
      xlab = "Number of steps per day", 
      ylab = "Frequency",
-     main = "Histogram of Number of steps per day")
+     main = "Histogram of number of steps per day")
 ```
 
 ![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
@@ -105,13 +106,13 @@ nstepsimp <- stepdataimputed %>%
 hist(nstepsimp$stepsperday, breaks= seq(0,25000,by=1000),
      xlab = "Number of steps per day", 
      ylab = "Frequency",
-     main = "Histogram of Number of steps per day (Imputed)")
+     main = "Histogram of number of steps per day (Imputed)")
 ```
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
 ```r
-meanstepsimp <- round(mean(nstepsimp$stepsperday), digits = 0)
+meanstepsimp <- mean(nstepsimp$stepsperday)
 medianstepsimp <- median(nstepsimp$stepsperday)
 
 meandiff <- meanstepsimp-meansteps
@@ -122,12 +123,35 @@ totstepsimp <- sum(stepdataimputed$steps)
 stepsdiff <- totstepsimp-totsteps
 ```
 
-- Mean (Imputed): 1.0766 &times; 10<sup>4</sup>  
+- Mean (Imputed): 1.0766189 &times; 10<sup>4</sup>  
 - Median (Imputed): 1.0766189 &times; 10<sup>4</sup>  
 - Yes, these values differ from the estimates in the first part of the assignment.  
-- The mean number of steps goes up by 1412 and the median goes up by 371.1886792
+- The mean number of steps goes up by 1412.1886792 and the median goes up by 371.1886792
 - The total number of steps before and after imputation is 570608 and 6.5673751 &times; 10<sup>5</sup> respectively.
 - The total number of steps goes up by 8.6129509 &times; 10<sup>4</sup>
 
+
 ## Are there differences in activity patterns between weekdays and weekends?
 
+### 1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+```r
+stepdataimputed$datetype <- ifelse(!is.element(weekdays(as.Date(stepdataimputed$date)),
+                                         c("Saturday","Sunday")),"Weekday","Weekend")
+```
+
+### 2. Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+
+```r
+avgstepsimp  <- stepdataimputed %>% 
+                group_by(interval,datetype) %>% 
+                summarise(averagesteps=mean(steps, na.rm=T))
+
+ggplot(avgstepsimp, aes(interval,averagesteps))+
+    geom_line()+
+    facet_grid(datetype ~.)+
+    labs(x="5 minute interval")+
+    labs(y="Average number of steps taken")
+```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 

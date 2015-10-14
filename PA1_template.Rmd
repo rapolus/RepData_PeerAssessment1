@@ -5,6 +5,7 @@
 ### 1.Load the data
 ```{r}
 suppressPackageStartupMessages(suppressWarnings(library(dplyr)))
+suppressPackageStartupMessages(suppressWarnings(library(ggplot2)))
 stepdata <- read.csv("activity.csv", header = TRUE)
 ```
 
@@ -26,7 +27,7 @@ nsteps <- stepdata %>%
 hist(nsteps$stepsperday, breaks= seq(0,25000,by=1000),
      xlab = "Number of steps per day", 
      ylab = "Frequency",
-     main = "Histogram of Number of steps per day")
+     main = "Histogram of number of steps per day")
 ```
 
 ### 3. Calculate and report the mean and median of the total number of steps taken per day
@@ -92,9 +93,9 @@ nstepsimp <- stepdataimputed %>%
 hist(nstepsimp$stepsperday, breaks= seq(0,25000,by=1000),
      xlab = "Number of steps per day", 
      ylab = "Frequency",
-     main = "Histogram of Number of steps per day (Imputed)")
+     main = "Histogram of number of steps per day (Imputed)")
 
-meanstepsimp <- round(mean(nstepsimp$stepsperday), digits = 0)
+meanstepsimp <- mean(nstepsimp$stepsperday)
 medianstepsimp <- median(nstepsimp$stepsperday)
 
 meandiff <- meanstepsimp-meansteps
@@ -113,5 +114,24 @@ stepsdiff <- totstepsimp-totsteps
 - The total number of steps before and after imputation is `r totsteps` and `r totstepsimp` respectively.
 - The total number of steps goes up by `r stepsdiff`
 
+
 ## Are there differences in activity patterns between weekdays and weekends?
 
+### 1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+```{r}
+stepdataimputed$datetype <- ifelse(!is.element(weekdays(as.Date(stepdataimputed$date)),
+                                         c("Saturday","Sunday")),"Weekday","Weekend")
+```
+
+### 2. Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+```{r}
+avgstepsimp  <- stepdataimputed %>% 
+                group_by(interval,datetype) %>% 
+                summarise(averagesteps=mean(steps, na.rm=T))
+
+ggplot(avgstepsimp, aes(interval,averagesteps))+
+    geom_line()+
+    facet_grid(datetype ~.)+
+    labs(x="5 minute interval")+
+    labs(y="Average number of steps taken")
+```
